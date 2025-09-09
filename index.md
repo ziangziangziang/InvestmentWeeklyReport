@@ -6,7 +6,7 @@ Welcome. Browse the weekly forsee and daily reports below.
 
 ## Weekly Forsee
 <ul>
-{% assign weeks = site.pages | where_exp: "p", "p.path contains 'forsee/'" | sort: "path" | reverse %}
+{% assign weeks = site.pages | where_exp: "p", "p.path contains 'foresee/'" | sort: "path" | reverse %}
 {% for p in weeks %}
   {% unless p.name == "index.md" %}
   <li>
