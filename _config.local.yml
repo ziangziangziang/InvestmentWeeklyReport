@@ -1,0 +1,3 @@
+# Local overrides for `bundle exec jekyll serve --config _config.yml,_config.local.yml`
+# Keep production values in _config.yml. Local browsing runs at /
+baseurl: ""

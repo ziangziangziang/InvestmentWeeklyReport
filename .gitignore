@@ -1,0 +1,28 @@
+# Jekyll build and cache
+_site/
+.jekyll-cache/
+.sass-cache/
+.bundle/
+
+# Ruby / bundler
+/vendor/
+Gemfile.lock
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Node (if ever added)
+node_modules/
+package-lock.json
+yarn.lock
+
+# Logs
+*.log
+
+# Editor/IDE
+.vscode/
+.idea/
+*.swp
+*.swo

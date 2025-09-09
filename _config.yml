@@ -1,0 +1,42 @@
+# Site settings for GitHub Pages. IMPORTANT: Set url and baseurl for your repo.
+# For a project site at https://YOUR-USER.github.io/YOUR-REPO, use:
+#   url: "https://YOUR-USER.github.io"
+#   baseurl: "/YOUR-REPO"
+# For a user/organization site at https://YOUR-USER.github.io, use:
+#   url: "https://YOUR-USER.github.io"
+#   baseurl: ""
+
+title: Investment Plans
+description: Weekly forsee and daily reports
+url: "https://YOUR-USER.github.io"   # TODO: replace with your GitHub username/org, e.g. https://octo.github.io
+baseurl: "/YOUR-REPO"                 # TODO: replace with your repository name, e.g. /invest-report
+permalink: pretty
+markdown: kramdown
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+  hard_wrap: false
+  auto_ids: true
+  footnote_nr: 1
+  entity_output: as_char
+  toc_levels: 1..6
+  smart_quotes: lsquo,rsquo,ldquo,rdquo
+  enable_coderay: false
+
+plugins:
+  - jekyll-optional-front-matter
+
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: default
+
+exclude:
+  - .github/
+  - node_modules/
+  - README.md
+  - LICENSE
+  - Gemfile.lock
+  - package.json
+  - package-lock.json
