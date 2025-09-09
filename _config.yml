@@ -8,8 +8,8 @@
 
 title: Investment Plans
 description: Weekly forsee and daily reports
-url: "https://YOUR-USER.github.io"   # TODO: replace with your GitHub username/org, e.g. https://octo.github.io
-baseurl: "/YOUR-REPO"                 # TODO: replace with your repository name, e.g. /invest-report
+url: "https://ziangziangziang.github.io"   # TODO: replace with your GitHub username/org, e.g. https://octo.github.io
+baseurl: "/InvestmentWeeklyReport"
 permalink: pretty
 markdown: kramdown
 kramdown:
