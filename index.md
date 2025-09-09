@@ -4,7 +4,7 @@ title: Home
 
 Welcome. Browse the weekly forsee and daily reports below.
 
-## Weekly Forsee
+## Weekly Foresee
 <ul>
 {% assign weeks = site.pages | where_exp: "p", "p.path contains 'foresee/'" | sort: "path" | reverse %}
 {% for p in weeks %}
