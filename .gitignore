@@ -3,11 +3,15 @@ _site/
 .jekyll-cache/
 .sass-cache/
 .bundle/
-
+env.local
+_config.local.yml
+data.local
+*.local
+venv/
 # Ruby / bundler
 /vendor/
 Gemfile.lock
-
+__pycache__/
 # macOS
 .DS_Store
 .AppleDouble

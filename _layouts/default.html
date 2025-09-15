@@ -276,6 +276,53 @@
         color: var(--text-secondary);
       }
 
+      /* Latest report small UI */
+      .latest-report {
+        display: flex;
+        gap: 0.5rem;
+        align-items: baseline;
+        margin-bottom: 1rem;
+      }
+
+      .latest-report a {
+        color: var(--text-primary);
+        font-weight: 700;
+      }
+
+      .latest-report small {
+        color: var(--text-secondary);
+        font-weight: 400;
+        margin-left: 0.5rem;
+      }
+
+      /* Embedded report styling */
+      .embedded-report {
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02));
+  border: 1px solid var(--border-color);
+  padding: 1rem;
+  border-radius: 8px;
+  margin: 1rem 0 1.5rem 0;
+  min-height: 80vh;
+  max-height: 80vh;
+  overflow: auto;
+      }
+
+      .embedded-report img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+        margin: 0.5rem 0;
+      }
+
+      .embedded-report .mermaid {
+        padding: 1rem;
+        margin: 0.5rem 0;
+      }
+
+      @media (max-width: 768px) {
+        .embedded-report { min-height: 60vh; max-height: 60vh; }
+      }
+
       /* Footer */
       footer {
         background: var(--gray-100);
