@@ -151,6 +151,11 @@
         margin-bottom: 2rem;
         box-shadow: var(--shadow);
         transition: box-shadow 0.2s ease;
+        /* Allow horizontal scroll inside cards when a child (eg. wide table) exceeds
+           the card width. This prevents the table from overflowing the page layout
+           while still allowing users to scroll to see full content. */
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
       }
 
       .content-card:hover {
@@ -218,6 +223,9 @@
       /* Table styling - Robinhood inspired dark theme */
       table {
         width: 100%;
+        max-width: 100%;
+        /* Slightly smaller table font to improve density and reduce overflow */
+        font-size: 0.875rem;
         border-collapse: collapse;
         margin: 1.5rem 0;
         background: var(--card-bg);
@@ -244,6 +252,13 @@
         border-bottom: 1px solid var(--border-color);
         color: var(--text-secondary);
         vertical-align: top;
+        /* Allow long or unbroken content (like long URLs or long numbers) to wrap
+           inside table cells instead of forcing the table to grow beyond its
+           container. overflow-wrap: anywhere gives the browser flexibility to
+           break words when necessary. */
+        word-break: break-word;
+        overflow-wrap: anywhere;
+        white-space: normal;
       }
 
       tbody tr:hover {
@@ -356,12 +371,13 @@
           padding: 1.5rem;
         }
 
+        /* Make tables more compact on small screens */
         table {
-          font-size: 0.875rem;
+          font-size: 0.8rem;
         }
 
         th, td {
-          padding: 0.75rem;
+          padding: 0.5rem 0.6rem;
         }
       }
 
@@ -471,6 +487,17 @@
       @keyframes pixelHeartBeat {
         0%, 100% { transform: scale(1); }
         50% { transform: scale(1.2); }
+      }
+
+      /* Override site-generated rules that force no-wrap for CSV or markdown tables.
+         These selectors are intentionally specific and scoped to .content-card so
+         they don't affect other parts of the site unexpectedly. */
+      .content-card .markdown-body .csv-data td,
+      .content-card .markdown-body .csv-data th,
+      .content-card .no-wrap {
+        white-space: normal !important;
+        word-break: break-word;
+        overflow-wrap: anywhere;
       }
     </style>
   </head>
