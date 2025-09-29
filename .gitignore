@@ -4,6 +4,7 @@ _site/
 .sass-cache/
 .bundle/
 env.local
+.env
 _config.local.yml
 data.local
 *.local

@@ -1,0 +1,71 @@
+---
+stocks:
+  meme:
+    description: MEME stocks
+    tickers:
+      - GME
+      - AMC
+      - OPEN
+      - KSS
+      - DNUT
+      - UUUU
+      - BB
+      - FFAI
+      - GLXY
+      - PEW
+      - BBAI
+      - GPRO
+      - BYND
+      - RKT
+      - NVAX
+  warfare:
+    description: Defense stocks
+    tickers:
+      - LMT
+      - RTX
+      - NOC
+      - BA
+      - EUAD
+  daily_life_products:
+    description: Favorite products
+    tickers:
+      - RDDT
+      - GTLB
+      - ZG
+      - GOOGL
+      - COF
+      - KR
+      - H
+      - JD
+      - PEP
+      - CATO
+      - HOOD
+      - HPE
+  homie:
+    description: Homie stocks for option trading
+    tickers:
+      - OPEN
+      - QBTS
+      - MP
+      - TSLA
+      - UNH
+      - NVDA
+      - AMD
+      - INTC
+      - ADBE
+      - PLTR
+      - ORCL
+      - GTLB
+indexes:
+    '^SPX': 'S&P 500'
+    '^SP500-50': 'Comm Services'
+    '^SP500-25': 'Cons Disc'
+    '^SP500-30': 'Cons Staples'
+    '^GSPE': 'Energy' # SP500-10 is not available via yfinance
+    '^SP500-40': 'Financials'
+    '^SP500-35': 'Health'
+    '^SP500-20': 'Industrials'
+    '^SP500-45': 'Tech'
+    '^SP500-15': 'Materials'
+    '^SP500-60': 'Real Estate'
+    '^SP500-55': 'Utilities'

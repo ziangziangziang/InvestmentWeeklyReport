@@ -35,3 +35,7 @@ Unless explicitly specified, the event will be for the U.S. economy. For event o
 | IPI | Industrial Production Index | Global |
 | CSI | Consumer Sentiment Index | Global |
 | MFG. | Manufacturing | Global |
+| AG. | Agriculture | Global |
+
+## Commonly used datasource
+- [CME Economy Calendar](https://www.cmegroup.com/education/events/economic-releases-calendar.html)

@@ -6,7 +6,7 @@ Usage:
   - set MONGO_URI in environment (defaults to mongodb://localhost:27017)
 
 Run example:
-    python toolbox/sp/av_fetch_and_store.py --symbol SPY
+    python toolbox/sp/av_fetch_and_store.py --symbol SPY --interval weekly
 
 This script will:
   - fetch TIME_SERIES_WEEKLY_ADJUSTED for the provided symbol
@@ -30,30 +30,27 @@ from pymongo import MongoClient
 from pymongo.collection import Collection
 from bson.objectid import ObjectId
 import urllib3
-
+import dotenv
 # suppress insecure request warnings when verify is disabled by default
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+dotenv.load_dotenv()
 
 ALPHA_URL = "https://www.alphavantage.co/query"
-RAW_COLL = "alpha_weekly_raw"
-SUMMARY_COLL = "alpha_weekly_summary"
+FUNCTION = "TIME_SERIES_DAILY"
+outputsize = "compact"  # for 100 days or "full" for the full-length data
+RAW_COLL = "alpha_daily_raw"
 
 
-def load_api_key(local_path: str = "toolbox/sp/alphaventage.api.local") -> Optional[str]:
+
+
+def load_api_key() -> str:
     # Try env first
     api_key = os.environ.get("ALPHAVANTAGE_KEY")
     if api_key:
         return api_key.strip()
     # Then try local file
-    try:
-        if os.path.exists(local_path):
-            with open(local_path, "r") as f:
-                content = f.read().strip()
-                if content:
-                    return content.splitlines()[0].strip()
-    except Exception:
-        pass
-    return None
+    else:
+        raise RuntimeError("ALPHAVANTAGE_KEY not found in env or toolbox/sp/alphaventage.api.local")
 
 
 class AlphaMongoClient:
@@ -102,6 +99,31 @@ def fetch_weekly(symbol: str, api_key: str, retry: int = 3, pause: float = 12.0,
             else:
                 resp.raise_for_status()
     raise RuntimeError("Failed to fetch weekly data")
+
+
+def fetch_daily(symbol: str, api_key: str, retry: int = 3, pause: float = 12.0, verify: bool = False) -> Dict[str, Any]:
+    """Fetch TIME_SERIES_DAILY_ADJUSTED for a symbol from AlphaVantage.
+
+    Returns the same shape as fetch_weekly: {"params": params, "data": data}
+    """
+    params = {
+        "function": "TIME_SERIES_DAILY_ADJUSTED",
+        "symbol": symbol,
+        "apikey": api_key,
+    }
+    for attempt in range(1, retry + 1):
+        resp = requests.get(ALPHA_URL, params=params, timeout=30, verify=verify)
+        if resp.status_code == 200:
+            data = resp.json()
+            if "Note" in data or "Error Message" in data:
+                raise RuntimeError(f"AlphaVantage API error: {data.get('Note') or data.get('Error Message')}")
+            return {"params": params, "data": data}
+        else:
+            if attempt < retry:
+                time.sleep(pause)
+            else:
+                resp.raise_for_status()
+    raise RuntimeError("Failed to fetch daily data")
 
 
 def compute_last_week_change(weekly_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
@@ -160,6 +182,48 @@ def save_weekly_to_mongo(symbol: str, fetched: Dict[str, Any], mongo: AlphaMongo
     }
     summary_id = mongo.insert_summary(summary_doc)
     return {"inserted_raw_id": raw_id, "inserted_summary_id": summary_id, "summary": summary_doc}
+
+
+def save_daily_to_mongo(symbol: str, fetched: Dict[str, Any], mongo: AlphaMongoClient, days: int = 14, avoid_duplicates: bool = True) -> Dict[str, Any]:
+    """Save daily fetched JSON to mongo, and extract the most recent `days` dates into _recent_daily.
+
+    Returns a dict indicating inserted ids or existing info when duplicate.
+    """
+    params = fetched["params"]
+    raw = fetched["data"]
+    # find the daily series key
+    # match any key that contains the word 'daily' (AlphaVantage uses keys like
+    # 'Time Series (Daily)' or 'Time Series (Daily)' with variations)
+    key_candidates = [k for k in raw.keys() if 'daily' in k.lower()]
+    series = {}
+    if key_candidates:
+        series = raw.get(key_candidates[0], {}) or {}
+
+    recent_daily = {}
+    dates = sorted(series.keys(), reverse=True) if series else []
+    if dates:
+        take = dates[:days]
+        for d in take:
+            recent_daily[d] = series.get(d)
+
+    # duplicate check: if latest raw for symbol has same latest date, skip insert
+    if avoid_duplicates:
+        latest = mongo.latest_raw_for_symbol(symbol)
+        if latest:
+            latest_raw_series = latest.get('raw', {}) or {}
+            key2 = next((k for k in latest_raw_series.keys() if 'daily' in k.lower()), None)
+            if key2:
+                latest_dates = sorted(latest_raw_series.get(key2, {}).keys(), reverse=True)
+                if latest_dates and dates and latest_dates[0] == dates[0]:
+                    # duplicate; return info about existing top date
+                    return {"inserted_raw_id": None, "existing_latest_date": dates[0]}
+
+    # embed recent_daily into raw copy so it's easy to query later
+    raw_copy = dict(raw)
+    raw_copy["_recent_daily"] = recent_daily
+
+    raw_id = mongo.insert_raw(symbol, params, raw_copy)
+    return {"inserted_raw_id": raw_id, "recent_days": list(recent_daily.keys())}
 
 
 def main(argv=None):

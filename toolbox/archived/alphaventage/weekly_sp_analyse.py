@@ -22,10 +22,24 @@ from pymongo import MongoClient
 # reuse alphaventage helpers for fetching and saving
 try:
     # when run as package
-    from toolbox.sp.alphaventage import AlphaMongoClient, fetch_weekly, load_api_key, save_weekly_to_mongo
+    from toolbox.sp.alphaventage import (
+        AlphaMongoClient,
+        fetch_weekly,
+        fetch_daily,
+        load_api_key,
+        save_weekly_to_mongo,
+        save_daily_to_mongo,
+    )
 except Exception:
     # fallback when running script from the same directory
-    from alphaventage import AlphaMongoClient, fetch_weekly, load_api_key, save_weekly_to_mongo
+    from alphaventage import (
+        AlphaMongoClient,
+        fetch_weekly,
+        fetch_daily,
+        load_api_key,
+        save_weekly_to_mongo,
+        save_daily_to_mongo,
+    )
 import argparse
 
 SECTORS = [
@@ -244,6 +258,8 @@ if __name__ == "__main__":
     parser.add_argument("--sp500", action="store_true", help="Print SP500-style markdown table")
     parser.add_argument("--mock", action="store_true", help="Use mock/sample data instead of querying MongoDB (for testing)")
     parser.add_argument("--fetch-missing", action="store_true", help="Fetch missing symbols from AlphaVantage and store to DB before analysis")
+    parser.add_argument("--fetch-daily-last2w", action="store_true", help="Fetch daily data for the last 2 weeks for missing symbols and store in DB")
+    parser.add_argument("--daily-days", type=int, default=14, help="Number of recent daily days to store when using --fetch-daily-last2w (default 14)")
     parser.add_argument("--secure", action="store_true", help="Enable SSL verification when fetching from AlphaVantage (default is insecure)")
     parser.add_argument("--recompute-ytd", action="store_true", help="Recompute YTD for symbols from stored raw series and update summary documents")
     args = parser.parse_args()
@@ -286,6 +302,21 @@ if __name__ == "__main__":
                             print(f"Fetched and saved data for {s}: {res}")
                         except Exception as e:
                             print(f"Error fetching {s}: {e}")
+        # optionally fetch recent daily data for missing symbols
+        if args.fetch_daily_last2w:
+            api_key = load_api_key()
+            if not api_key:
+                print("ALPHAVANTAGE_KEY not found; cannot fetch daily data")
+            else:
+                amin = AlphaMongoClient(mongo_uri=os.environ.get('MONGO_URI'), db_name=os.environ.get('SP_DB', 'FIN'))
+                for s in symbols:
+                    # always try to save recent daily data even if weekly summary exists
+                    try:
+                        fetched = fetch_daily(s, api_key, verify=args.secure)
+                        res = save_daily_to_mongo(s, fetched, amin, days=args.daily_days, avoid_duplicates=True)
+                        print(f"Fetched and saved recent daily for {s}: {res}")
+                    except Exception as e:
+                        print(f"Error fetching daily {s}: {e}")
         results = analyser.run_all(symbols)
 
     # optionally recompute YTD in DB (updates latest summary doc per symbol)

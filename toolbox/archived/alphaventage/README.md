@@ -1,5 +1,6 @@
-AlphaVantage fetcher
+# AlphaVantage fetcher - Archived.
 
+We will not use the alphaventage for data fetching. Please refer to [ploygon](/toolbox/polygon/)
 This folder contains a small utility to fetch weekly time series from AlphaVantage and store the raw response and a small summary into a local MongoDB.
 
 Requirements
