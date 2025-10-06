@@ -88,6 +88,17 @@
         z-index: 100;
         backdrop-filter: blur(10px);
         background: rgba(13, 17, 23, 0.95);
+        transition: transform 0.28s cubic-bezier(.2,.7,.2,1), box-shadow 0.2s ease;
+        will-change: transform;
+      }
+
+      /* Only apply the hidden transform on small screens */
+      @media (max-width: 768px) {
+        header.header-hidden {
+          transform: translateY(-110%);
+          pointer-events: none; /* avoid accidental taps when hidden */
+          box-shadow: none;
+        }
       }
 
       [data-theme="light"] header {
@@ -278,14 +289,14 @@
         margin: 2rem 0;
         text-align: center;
         box-shadow: var(--shadow);
-        font-family: "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", Consolas, "Courier New", monospace;
+        font-family: "Arial", sans-serif;
       }
 
       /* Ensure mermaid/SVG labels are not rendered italic by default; makes
          diagram labels more readable on phones and small screens. */
       svg text, svg tspan, .mermaid text, .mermaid tspan, .mermaid .label, .mermaid .nodeLabel {
         font-style: normal !important;
-        font-family: "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", Consolas, "Courier New", monospace;
+        font-family: "Arial", sans-serif;
       }
 
       /* List styling */
@@ -704,5 +715,59 @@
         });
       })();
     </script>
+
+    <!-- Mobile header auto-hide: hide on scroll down, show on scroll up -->
+    <script>
+      (function () {
+        // Limit to touch devices or small screens
+        if (window.innerWidth > 768 && !('ontouchstart' in window)) return;
+
+        var header = document.querySelector('header');
+        if (!header) return;
+
+        var lastY = window.pageYOffset || document.documentElement.scrollTop;
+        var ticking = false;
+        var threshold = 10; // ignore tiny scrolls
+        var pinned = true;
+
+        function handle() {
+          var currentY = window.pageYOffset || document.documentElement.scrollTop;
+          var delta = currentY - lastY;
+
+          if (Math.abs(delta) > threshold) {
+            if (delta > 0 && currentY > 60) {
+              // scrolling down
+              if (pinned) {
+                header.classList.add('header-hidden');
+                pinned = false;
+              }
+            } else {
+              // scrolling up
+              if (!pinned) {
+                header.classList.remove('header-hidden');
+                pinned = true;
+              }
+            }
+            lastY = currentY;
+          }
+          ticking = false;
+        }
+
+        window.addEventListener('scroll', function () {
+          if (!ticking) {
+            window.requestAnimationFrame(handle);
+            ticking = true;
+          }
+        }, { passive: true });
+
+        // Ensure header is visible on orientation/resize to larger screens
+        window.addEventListener('resize', function () {
+          if (window.innerWidth > 768) {
+            header.classList.remove('header-hidden');
+          }
+        });
+      })();
+    </script>
+
   </body>
 </html>
