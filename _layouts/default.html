@@ -280,6 +280,12 @@
         box-shadow: var(--shadow);
       }
 
+      /* Ensure mermaid/SVG labels are not rendered italic by default; makes
+         diagram labels more readable on phones and small screens. */
+      svg text, svg tspan, .mermaid text, .mermaid tspan, .mermaid .label, .mermaid .nodeLabel {
+        font-style: normal !important;
+      }
+
       /* List styling */
       ul, ol {
         padding-left: 1.5rem;
