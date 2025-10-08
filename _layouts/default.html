@@ -6,6 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" href="{{ '/public/favicon.svg' | relative_url }}" type="image/svg+xml">
 
+    <!-- Add minimal Comic-like webfont (Comic Neue) with preconnect for small cost -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+
     <style>
       :root { 
         /* Dark mode as default */
@@ -31,6 +36,8 @@
         --shadow-hover: 0 4px 16px rgba(0,0,0,0.8);
         --accent-bg: rgba(0, 200, 5, 0.1);
         --accent-border: rgba(0, 200, 5, 0.3);
+        /* Minimal Comic-family stack (uses Comic Neue from Google Fonts then system Comic Sans) */
+        --comic-font: "Comic Neue", "Comic Sans MS", "Comic Sans", cursive;
         color-scheme: dark;
       }
 
@@ -297,6 +304,22 @@
       svg text, svg tspan, .mermaid text, .mermaid tspan, .mermaid .label, .mermaid .nodeLabel {
         font-style: normal !important;
         font-family: "Arial", sans-serif;
+      }
+
+      /* Apply the comic font only to mermaid/diagram output and derived rough elements */
+      .mermaid,
+      .mermaid svg,
+      .mermaid text,
+      .mermaid tspan,
+      .mermaid .label,
+      .mermaid .nodeLabel {
+        font-family: var(--comic-font) !important;
+      }
+      
+      /* Ensure svg2roughjs-created canvases/svgs prefer the comic font when possible */
+      .mermaid canvas,
+      .mermaid svg:last-child {
+        font-family: var(--comic-font);
       }
 
       /* List styling */
@@ -656,7 +679,8 @@
                 stroke: '#8b949e',
                 strokeWidth: 1.5,
                 fillStyle: 'solid',
-                fontFamily: 'Comic Sans MS, sans-serif, monospace',
+                // Prefer the Comic-like font we added; fallback to system comics then cursive
+                fontFamily: '"Comic Neue", "Comic Sans MS", "Comic Sans", cursive',
                 seed: 42
               };
               
